@@ -9,13 +9,194 @@ from register_gui import RegisterGUI
 from sales_history_gui import SalesHistoryGUI
 
 
+# --------------------------------------------------
+# Application styling
+# --------------------------------------------------
+
+def apply_theme(root):
+    style = ttk.Style(root)
+    style.theme_use("clam")
+
+    background = "#F3F5F9"
+    surface = "#FFFFFF"
+    accent = "#2563EB"
+    accent_hover = "#1D4ED8"
+    text = "#1F2937"
+    muted = "#64748B"
+    border = "#DCE3EC"
+
+    root.configure(bg=background)
+
+    style.configure(
+        ".",
+        font=("Segoe UI", 10),
+        background=background,
+        foreground=text
+    )
+
+    style.configure("TFrame", background=background)
+
+    style.configure(
+        "TLabel",
+        background=background,
+        foreground=text,
+        font=("Segoe UI", 10)
+    )
+
+    style.configure(
+        "Header.TLabel",
+        background=background,
+        foreground=text,
+        font=("Segoe UI", 21, "bold")
+    )
+
+    style.configure(
+        "Stats.TLabel",
+        background=surface,
+        foreground=text,
+        font=("Segoe UI", 12, "bold")
+    )
+
+    style.configure(
+        "TLabelframe",
+        background=surface,
+        bordercolor=border,
+        borderwidth=1,
+        relief="solid"
+    )
+
+    style.configure(
+        "TLabelframe.Label",
+        background=surface,
+        foreground=text,
+        font=("Segoe UI", 11, "bold"),
+        padding=(6, 4)
+    )
+
+    style.configure(
+        "TEntry",
+        fieldbackground=surface,
+        foreground=text,
+        bordercolor=border,
+        lightcolor=border,
+        darkcolor=border,
+        padding=7
+    )
+
+    style.map(
+        "TEntry",
+        bordercolor=[("focus", accent)]
+    )
+
+    style.configure(
+        "TButton",
+        font=("Segoe UI", 10),
+        padding=(14, 9),
+        background="#E8EDF5",
+        foreground=text,
+        borderwidth=0,
+        relief="flat"
+    )
+
+    style.map(
+        "TButton",
+        background=[
+            ("pressed", "#CBD5E1"),
+            ("active", "#DCE5F1")
+        ],
+        foreground=[("disabled", muted)]
+    )
+
+    # Blue button styling
+    style.configure(
+        "Accent.TButton",
+        background=accent,
+        foreground="#FFFFFF",
+        font=("Segoe UI", 10, "bold"),
+        padding=(14, 9),
+        borderwidth=0
+    )
+
+    style.map(
+        "Accent.TButton",
+        background=[
+            ("pressed", "#1E40AF"),
+            ("active", accent_hover)
+        ],
+        foreground=[
+            ("active", "#FFFFFF"),
+            ("pressed", "#FFFFFF")
+        ]
+    )
+
+    # Red button styling for Clear Fields
+    style.configure(
+        "Danger.TButton",
+        background="#DC2626",
+        foreground="#FFFFFF",
+        font=("Segoe UI", 10, "bold"),
+        padding=(14, 9),
+        borderwidth=0
+    )
+
+    style.map(
+        "Danger.TButton",
+        background=[
+            ("pressed", "#991B1B"),
+            ("active", "#B91C1C")
+        ],
+        foreground=[
+            ("active", "#FFFFFF"),
+            ("pressed", "#FFFFFF")
+        ]
+    )
+
+    style.configure(
+        "Treeview",
+        background=surface,
+        fieldbackground=surface,
+        foreground=text,
+        rowheight=32,
+        font=("Segoe UI", 10),
+        borderwidth=0
+    )
+
+    style.map(
+        "Treeview",
+        background=[("selected", accent)],
+        foreground=[("selected", "#FFFFFF")]
+    )
+
+    style.configure(
+        "Treeview.Heading",
+        background="#E8EDF5",
+        foreground=text,
+        font=("Segoe UI", 10, "bold"),
+        padding=(8, 9),
+        relief="flat"
+    )
+
+    style.map(
+        "Treeview.Heading",
+        background=[("active", "#DCE5F1")]
+    )
+
+    style.configure(
+        "TScrollbar",
+        background="#CBD5E1",
+        troughcolor=background,
+        borderwidth=0,
+        arrowsize=13
+    )
+
+
 class InventoryGUI:
     def __init__(self, root):
         self.root = root
         self.root.title("Disc Replay Inventory System")
-
-        # Open Inventory maximized.
         self.root.state("zoomed")
+
+        apply_theme(self.root)
 
         self.inventory = Inventory()
         self.register = Register(self.inventory)
@@ -23,20 +204,26 @@ class InventoryGUI:
         self.register_window = None
         self.history_window = None
 
+        # Prevent live search while fields are filled by code.
+        self.updating_fields = False
+
         ttk.Label(
             root,
             text="Disc Replay Inventory System",
-            font=("Arial", 18, "bold")
-        ).pack(pady=10)
+            style="Header.TLabel"
+        ).pack(pady=(18, 12))
 
+        # --------------------------------------------------
         # Inventory table
+        # --------------------------------------------------
+
         table_frame = ttk.LabelFrame(
             root,
             text="Current Inventory"
         )
         table_frame.pack(
-            padx=10,
-            pady=5,
+            padx=18,
+            pady=7,
             fill="both",
             expand=True
         )
@@ -63,12 +250,17 @@ class InventoryGUI:
         ]
 
         for name, width in columns:
-            self.inventory_table.heading(name, text=name)
+            self.inventory_table.heading(
+                name,
+                text=name,
+                anchor="center"
+            )
             self.inventory_table.column(
                 name,
                 width=width,
                 minwidth=55,
-                stretch=True
+                stretch=True,
+                anchor="center"
             )
 
         scrollbar = ttk.Scrollbar(
@@ -81,14 +273,19 @@ class InventoryGUI:
             yscrollcommand=scrollbar.set
         )
 
-        scrollbar.pack(side="right", fill="y")
+        scrollbar.pack(
+            side="right",
+            fill="y",
+            pady=8,
+            padx=(0, 8)
+        )
 
         self.inventory_table.pack(
             side="left",
             fill="both",
             expand=True,
-            padx=5,
-            pady=5
+            padx=10,
+            pady=10
         )
 
         self.inventory_table.bind(
@@ -96,14 +293,17 @@ class InventoryGUI:
             self.select_item
         )
 
+        # --------------------------------------------------
         # Item details
+        # --------------------------------------------------
+
         details_frame = ttk.LabelFrame(
             root,
             text="Item Details"
         )
         details_frame.pack(
-            padx=10,
-            pady=5,
+            padx=18,
+            pady=7,
             fill="x"
         )
 
@@ -127,12 +327,13 @@ class InventoryGUI:
 
             ttk.Label(
                 details_frame,
-                text=label
+                text=label,
+                background="#FFFFFF"
             ).grid(
                 row=row_number * 2,
                 column=column_number,
-                padx=8,
-                pady=(4, 0),
+                padx=12,
+                pady=(7, 0),
                 sticky="w"
             )
 
@@ -142,99 +343,127 @@ class InventoryGUI:
             ).grid(
                 row=row_number * 2 + 1,
                 column=column_number,
-                padx=8,
-                pady=(0, 4),
+                padx=12,
+                pady=(2, 7),
                 sticky="ew"
             )
 
         details_frame.columnconfigure(0, weight=1)
         details_frame.columnconfigure(1, weight=1)
 
+        # Live inventory filtering.
+        self.title_var.trace_add(
+            "write",
+            self.filter_inventory
+        )
+
+        # --------------------------------------------------
         # Inventory controls
+        # --------------------------------------------------
+
         button_frame = ttk.LabelFrame(
             root,
             text="Inventory Controls"
         )
         button_frame.pack(
-            padx=10,
-            pady=5,
+            padx=18,
+            pady=7,
             fill="x"
         )
 
+        # Searching happens automatically while typing.
         buttons = [
             ("Add Item", self.add_item),
             ("Remove Item", self.remove_item),
-            ("Search Item", self.search_item),
             ("Update Quantity", self.update_quantity),
             ("Update Price", self.update_price),
             ("Clear Fields", self.clear_fields)
         ]
 
-        for index, (text, command) in enumerate(buttons):
+        for index, (button_text, command) in enumerate(buttons):
             row_number = index // 3
             column_number = index % 3
 
+            # Assign button colors.
+            if button_text == "Add Item":
+                button_style = "Accent.TButton"
+            elif button_text == "Clear Fields":
+                button_style = "Danger.TButton"
+            else:
+                button_style = "TButton"
+
+            # Clear Fields spans the final two columns.
+            column_span = (
+                2 if button_text == "Clear Fields" else 1
+            )
+
             ttk.Button(
                 button_frame,
-                text=text,
-                command=command
+                text=button_text,
+                command=command,
+                style=button_style
             ).grid(
                 row=row_number,
                 column=column_number,
-                padx=5,
-                pady=5,
+                columnspan=column_span,
+                padx=8,
+                pady=8,
                 sticky="ew"
             )
 
         for column in range(3):
             button_frame.columnconfigure(column, weight=1)
 
+        # --------------------------------------------------
         # Cash register section
+        # --------------------------------------------------
+
         register_frame = ttk.LabelFrame(
             root,
             text="Cash Register"
         )
         register_frame.pack(
-            padx=10,
-            pady=8,
+            padx=18,
+            pady=(7, 14),
             fill="x"
         )
 
         self.till_label = ttk.Label(
             register_frame,
             text="Current Till: $150.00",
-            font=("Arial", 11, "bold")
+            style="Stats.TLabel"
         )
         self.till_label.grid(
             row=0,
             column=0,
-            padx=8,
-            pady=8,
+            padx=14,
+            pady=10,
             sticky="w"
         )
 
         self.sales_label = ttk.Label(
             register_frame,
             text="Daily Sales: $0.00",
-            font=("Arial", 11, "bold")
+            style="Stats.TLabel"
         )
         self.sales_label.grid(
             row=0,
             column=1,
-            padx=8,
-            pady=8,
+            padx=14,
+            pady=10,
             sticky="w"
         )
 
         ttk.Button(
             register_frame,
             text="Open Cash Register",
-            command=self.open_register
+            command=self.open_register,
+            style="Accent.TButton"
         ).grid(
             row=1,
             column=0,
-            padx=8,
-            pady=8,
+            padx=10,
+            pady=(2, 12),
             sticky="ew"
         )
 
@@ -245,8 +474,8 @@ class InventoryGUI:
         ).grid(
             row=1,
             column=1,
-            padx=8,
-            pady=8,
+            padx=10,
+            pady=(2, 12),
             sticky="ew"
         )
 
@@ -256,11 +485,20 @@ class InventoryGUI:
         self.refresh_inventory()
         self.refresh_register()
 
+    # --------------------------------------------------
+    # Inventory display and live search
+    # --------------------------------------------------
+
     def refresh_inventory(self):
+        search_text = self.title_var.get().strip().casefold()
+
         for row in self.inventory_table.get_children():
             self.inventory_table.delete(row)
 
         for item in self.inventory.view_inventory():
+            if search_text and search_text not in item.title.casefold():
+                continue
+
             self.inventory_table.insert(
                 "",
                 "end",
@@ -272,6 +510,12 @@ class InventoryGUI:
                     item.quantity
                 )
             )
+
+    def filter_inventory(self, *args):
+        if self.updating_fields:
+            return
+
+        self.refresh_inventory()
 
     def refresh_register(self):
         self.till_label.config(
@@ -293,23 +537,39 @@ class InventoryGUI:
             "values"
         )
 
-        self.title_var.set(values[0])
-        self.category_var.set(values[1])
-        self.type_var.set(values[2])
-        self.price_var.set(values[3].replace("$", ""))
-        self.quantity_var.set(values[4])
+        self.updating_fields = True
+
+        try:
+            self.title_var.set(values[0])
+            self.category_var.set(values[1])
+            self.type_var.set(values[2])
+            self.price_var.set(values[3].replace("$", ""))
+            self.quantity_var.set(values[4])
+        finally:
+            self.updating_fields = False
 
     def clear_fields(self):
-        selected = self.inventory_table.selection()
+        self.updating_fields = True
 
-        if selected:
-            self.inventory_table.selection_remove(selected)
+        try:
+            selected = self.inventory_table.selection()
 
-        self.title_var.set("")
-        self.category_var.set("")
-        self.type_var.set("")
-        self.price_var.set("")
-        self.quantity_var.set("")
+            if selected:
+                self.inventory_table.selection_remove(selected)
+
+            self.title_var.set("")
+            self.category_var.set("")
+            self.type_var.set("")
+            self.price_var.set("")
+            self.quantity_var.set("")
+        finally:
+            self.updating_fields = False
+
+        self.refresh_inventory()
+
+    # --------------------------------------------------
+    # Inventory operations
+    # --------------------------------------------------
 
     def get_item_from_fields(self):
         title = self.title_var.get().strip()
@@ -430,29 +690,6 @@ class InventoryGUI:
                 parent=self.root
             )
 
-    def search_item(self):
-        item = self.get_item_from_fields()
-
-        if item is None:
-            return
-
-        self.title_var.set(item.title)
-        self.category_var.set(item.category)
-        self.type_var.set(item.type)
-        self.price_var.set(f"{item.price:.2f}")
-        self.quantity_var.set(str(item.quantity))
-
-        for row in self.inventory_table.get_children():
-            values = self.inventory_table.item(row, "values")
-
-            if (
-                values[0].casefold() == item.title.casefold()
-                and values[2].casefold() == item.type.casefold()
-            ):
-                self.inventory_table.selection_set(row)
-                self.inventory_table.see(row)
-                break
-
     def update_quantity(self):
         item = self.get_item_from_fields()
 
@@ -524,6 +761,10 @@ class InventoryGUI:
                 f"Price updated for {item.title} ({item.type})!",
                 parent=self.root
             )
+
+    # --------------------------------------------------
+    # Other windows
+    # --------------------------------------------------
 
     def open_register(self):
         if (

@@ -6,7 +6,8 @@ from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
 def money(value):
     return Decimal(str(value)).quantize(
-        Decimal("0.01"), rounding=ROUND_HALF_UP
+        Decimal("0.01"),
+        rounding=ROUND_HALF_UP
     )
 
 
@@ -24,55 +25,121 @@ class RegisterGUI:
         self.window = tk.Toplevel(parent)
         self.window.title("Disc Replay - Cash Register")
 
-        # Open Cash Register maximized.
+        # Open the Cash Register maximized.
         self.window.state("zoomed")
 
+        # The main GUI already applies the shared ttk theme.
+        # These colors match that theme.
+        background = "#F3F5F9"
+        surface = "#FFFFFF"
+        text_color = "#1F2937"
+        accent = "#2563EB"
+
+        self.window.configure(bg=background)
+
+        # Local styles for the Cash Register.
+        # No imports from gui.py are needed.
+        style = ttk.Style(self.window)
+
+        style.configure(
+            "RegisterSurface.TFrame",
+            background=surface
+        )
+
+        style.configure(
+            "RegisterSurface.TLabel",
+            background=surface,
+            foreground=text_color,
+            font=("Segoe UI", 10)
+        )
+
+        style.configure(
+            "RegisterTotal.TLabel",
+            background=background,
+            foreground=accent,
+            font=("Segoe UI", 19, "bold")
+        )
+
+        style.configure(
+            "RegisterChange.TLabel",
+            background=surface,
+            foreground=text_color,
+            font=("Segoe UI", 14, "bold")
+        )
+
+        style.configure(
+            "RegisterStats.TLabel",
+            background=background,
+            foreground=text_color,
+            font=("Segoe UI", 11, "bold")
+        )
+
+        style.configure(
+            "RegisterQuantity.TLabel",
+            background=surface,
+            foreground=text_color,
+            font=("Segoe UI", 16, "bold")
+        )
+
+        # --------------------------------------------------
         # Header
+        # --------------------------------------------------
+
         ttk.Label(
             self.window,
             text="Disc Replay Cash Register",
-            font=("Arial", 18, "bold")
-        ).pack(pady=6)
+            style="Header.TLabel"
+        ).pack(pady=(18, 12))
 
+        # --------------------------------------------------
         # Bottom payment section
+        # --------------------------------------------------
+
         bottom_frame = ttk.Frame(self.window)
         bottom_frame.pack(
             side="bottom",
             fill="x",
-            padx=10,
-            pady=5
+            padx=18,
+            pady=(7, 14)
         )
 
         self.total_label = ttk.Label(
             bottom_frame,
             text="Sale Total: $0.00",
-            font=("Arial", 15, "bold")
+            style="RegisterTotal.TLabel"
         )
-        self.total_label.pack(pady=2)
+        self.total_label.pack(pady=(5, 10))
 
         # Cash payment
         payment_frame = ttk.LabelFrame(
             bottom_frame,
             text="Cash Payment"
         )
-        payment_frame.pack(fill="x", pady=3)
+        payment_frame.pack(
+            fill="x",
+            pady=5
+        )
 
-        payment_controls = ttk.Frame(payment_frame)
-        payment_controls.pack(pady=4)
+        payment_controls = ttk.Frame(
+            payment_frame,
+            style="RegisterSurface.TFrame"
+        )
+        payment_controls.pack(pady=8)
 
         ttk.Label(
             payment_controls,
-            text="Cash Received: $"
-        ).pack(side="left", padx=4)
+            text="Cash Received: $",
+            style="RegisterSurface.TLabel"
+        ).pack(side="left", padx=6)
 
         self.cash_var = tk.StringVar()
 
         self.cash_entry = ttk.Entry(
             payment_controls,
             textvariable=self.cash_var,
-            width=14
+            width=16
         )
-        self.cash_entry.pack(side="left", padx=4)
+        self.cash_entry.pack(side="left", padx=6)
 
         self.cash_var.trace_add(
             "write",
@@ -82,33 +149,37 @@ class RegisterGUI:
         self.change_label = ttk.Label(
             payment_frame,
             text="Change Due: $0.00",
-            font=("Arial", 13, "bold")
+            style="RegisterChange.TLabel"
         )
-        self.change_label.pack(pady=3)
+        self.change_label.pack(pady=(3, 10))
 
+        # --------------------------------------------------
         # Till and daily sales
+        # --------------------------------------------------
+
         totals_frame = ttk.Frame(bottom_frame)
-        totals_frame.pack(pady=4)
+        totals_frame.pack(pady=8)
 
         self.till_label = ttk.Label(
             totals_frame,
-            font=("Arial", 10)
+            style="RegisterStats.TLabel"
         )
-        self.till_label.pack(side="left", padx=12)
+        self.till_label.pack(side="left", padx=18)
 
         self.sales_label = ttk.Label(
             totals_frame,
-            font=("Arial", 10)
+            style="RegisterStats.TLabel"
         )
-        self.sales_label.pack(side="left", padx=12)
+        self.sales_label.pack(side="left", padx=18)
 
         button_frame = ttk.Frame(bottom_frame)
-        button_frame.pack(pady=5)
+        button_frame.pack(pady=8)
 
         ttk.Button(
             button_frame,
             text="Complete Sale",
-            command=self.complete_sale
+            command=self.complete_sale,
+            style="Accent.TButton"
         ).pack(side="left", padx=8)
 
         ttk.Button(
@@ -117,21 +188,25 @@ class RegisterGUI:
             command=self.close_register
         ).pack(side="left", padx=8)
 
+        # --------------------------------------------------
         # Product search
+        # --------------------------------------------------
+
         search_frame = ttk.LabelFrame(
             self.window,
             text="Search Products"
         )
         search_frame.pack(
-            padx=10,
-            pady=3,
+            padx=18,
+            pady=7,
             fill="x"
         )
 
         ttk.Label(
             search_frame,
-            text="Start typing a movie or game title:"
-        ).pack(pady=(4, 2))
+            text="Start typing a movie or game title:",
+            style="RegisterSurface.TLabel"
+        ).pack(pady=(10, 4))
 
         self.search_var = tk.StringVar()
 
@@ -140,8 +215,8 @@ class RegisterGUI:
             textvariable=self.search_var
         )
         self.search_entry.pack(
-            padx=8,
-            pady=3,
+            padx=14,
+            pady=6,
             fill="x"
         )
 
@@ -154,18 +229,32 @@ class RegisterGUI:
             self.focus_results
         )
 
+        # --------------------------------------------------
         # Autocomplete results
-        self.results_frame = ttk.Frame(search_frame)
+        # --------------------------------------------------
+
+        self.results_frame = ttk.Frame(
+            search_frame,
+            style="RegisterSurface.TFrame"
+        )
         self.results_frame.pack(
-            padx=8,
+            padx=14,
             fill="x"
         )
 
         self.results_list = tk.Listbox(
             self.results_frame,
             height=4,
-            font=("Arial", 10),
-            exportselection=False
+            font=("Segoe UI", 10),
+            exportselection=False,
+            background=surface,
+            foreground=text_color,
+            selectbackground=accent,
+            selectforeground="#FFFFFF",
+            borderwidth=1,
+            relief="solid",
+            highlightthickness=0,
+            activestyle="none"
         )
 
         self.results_scrollbar = ttk.Scrollbar(
@@ -189,35 +278,50 @@ class RegisterGUI:
 
         self.results_visible = False
 
+        # --------------------------------------------------
         # Product information
-        info_frame = ttk.Frame(search_frame)
-        info_frame.pack(pady=4)
+        # --------------------------------------------------
+
+        info_frame = ttk.Frame(
+            search_frame,
+            style="RegisterSurface.TFrame"
+        )
+        info_frame.pack(pady=(8, 12))
 
         self.stock_label = ttk.Label(
             info_frame,
-            text="Available Stock: 0"
+            text="Available Stock: 0",
+            style="RegisterSurface.TLabel"
         )
-        self.stock_label.pack(side="left", padx=10)
+        self.stock_label.pack(side="left", padx=14)
 
         self.price_label = ttk.Label(
             info_frame,
-            text="Unit Price: $0.00"
+            text="Unit Price: $0.00",
+            style="RegisterSurface.TLabel",
+            font=("Segoe UI", 10, "bold")
         )
-        self.price_label.pack(side="left", padx=10)
+        self.price_label.pack(side="left", padx=14)
 
+        # --------------------------------------------------
         # Quantity controls
+        # --------------------------------------------------
+
         quantity_frame = ttk.LabelFrame(
             self.window,
             text="Quantity to Add"
         )
         quantity_frame.pack(
-            padx=10,
-            pady=3,
+            padx=18,
+            pady=7,
             fill="x"
         )
 
-        controls = ttk.Frame(quantity_frame)
-        controls.pack(pady=5)
+        controls = ttk.Frame(
+            quantity_frame,
+            style="RegisterSurface.TFrame"
+        )
+        controls.pack(pady=10)
 
         self.quantity_var = tk.IntVar(value=1)
 
@@ -226,56 +330,63 @@ class RegisterGUI:
             text="-",
             width=4,
             command=self.decrease_quantity
-        ).grid(row=0, column=0, padx=5)
+        ).grid(row=0, column=0, padx=6)
 
         ttk.Label(
             controls,
             textvariable=self.quantity_var,
-            font=("Arial", 15, "bold")
-        ).grid(row=0, column=1, padx=5)
+            style="RegisterQuantity.TLabel"
+        ).grid(row=0, column=1, padx=10)
 
         ttk.Button(
             controls,
             text="+",
             width=4,
             command=self.increase_quantity
-        ).grid(row=0, column=2, padx=5)
+        ).grid(row=0, column=2, padx=6)
 
         ttk.Button(
             controls,
             text="Add to Cart",
-            command=self.add_to_cart
-        ).grid(row=0, column=3, padx=8)
+            command=self.add_to_cart,
+            style="Accent.TButton"
+        ).grid(row=0, column=3, padx=12)
 
+        # --------------------------------------------------
         # Shopping cart
+        # --------------------------------------------------
+
         cart_frame = ttk.LabelFrame(
             self.window,
             text="Current Sale / Shopping Cart"
         )
         cart_frame.pack(
-            padx=10,
-            pady=4,
+            padx=18,
+            pady=7,
             fill="both",
             expand=True
         )
 
-        cart_buttons = ttk.Frame(cart_frame)
+        cart_buttons = ttk.Frame(
+            cart_frame,
+            style="RegisterSurface.TFrame"
+        )
         cart_buttons.pack(
             side="bottom",
-            pady=4
+            pady=10
         )
 
         ttk.Button(
             cart_buttons,
             text="Remove Selected",
             command=self.remove_selected
-        ).pack(side="left", padx=6)
+        ).pack(side="left", padx=8)
 
         ttk.Button(
             cart_buttons,
             text="Clear Cart",
             command=self.clear_cart
-        ).pack(side="left", padx=6)
+        ).pack(side="left", padx=8)
 
         self.cart_table = ttk.Treeview(
             cart_frame,
@@ -312,14 +423,19 @@ class RegisterGUI:
             yscrollcommand=cart_scrollbar.set
         )
 
-        cart_scrollbar.pack(side="right", fill="y")
+        cart_scrollbar.pack(
+            side="right",
+            fill="y",
+            pady=8,
+            padx=(0, 8)
+        )
 
         self.cart_table.pack(
             side="left",
             fill="both",
             expand=True,
-            padx=6,
-            pady=4
+            padx=10,
+            pady=10
         )
 
         self.refresh_items()
@@ -327,7 +443,9 @@ class RegisterGUI:
         self.refresh_register()
         self.search_entry.focus_set()
 
-    # PRODUCT SEARCH
+    # --------------------------------------------------
+    # Product search
+    # --------------------------------------------------
 
     def item_key(self, item):
         return (item.title, item.type)
@@ -449,7 +567,9 @@ class RegisterGUI:
         )
         self.quantity_var.set(1)
 
-    # QUANTITY CONTROLS
+    # --------------------------------------------------
+    # Quantity controls
+    # --------------------------------------------------
 
     def increase_quantity(self):
         item = self.get_selected_item()
@@ -472,7 +592,9 @@ class RegisterGUI:
                 self.quantity_var.get() - 1
             )
 
-    # SHOPPING CART
+    # --------------------------------------------------
+    # Shopping cart
+    # --------------------------------------------------
 
     def add_to_cart(self):
         item = self.get_selected_item()
@@ -594,7 +716,9 @@ class RegisterGUI:
         if self.selected_item is not None:
             self.update_item_details()
 
-    # CASH PAYMENT
+    # --------------------------------------------------
+    # Cash payment
+    # --------------------------------------------------
 
     def update_change(self, *args):
         total = self.get_cart_total()
@@ -631,7 +755,9 @@ class RegisterGUI:
                 text=f"Change Due: ${change:.2f}"
             )
 
-    # REGISTER / CHECKOUT
+    # --------------------------------------------------
+    # Register and checkout
+    # --------------------------------------------------
 
     def refresh_register(self):
         self.till_label.config(

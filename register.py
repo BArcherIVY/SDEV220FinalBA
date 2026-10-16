@@ -114,6 +114,26 @@ class Register:
 
         change = money(cash - total)
 
+        # --------------------------------------------------
+        # Check whether the till has enough cash for change
+        # --------------------------------------------------
+
+        available_cash = money(self.current_till)
+
+        if change > available_cash:
+            return False, (
+                "Insufficient Cash in Register!\n\n"
+                f"Change Required: ${change:.2f}\n"
+                f"Cash Available in Till: ${available_cash:.2f}\n\n"
+                "There is not enough cash in the till to "
+                "provide this amount of change.\n\n"
+                "Please enter a different cash amount and try again."
+            )
+
+        # --------------------------------------------------
+        # Complete the sale only after all checks pass
+        # --------------------------------------------------
+
         for item, quantity, unit_price, subtotal in sale_items:
             item.quantity -= quantity
 
