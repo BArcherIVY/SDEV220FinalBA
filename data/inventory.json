@@ -4,20 +4,20 @@
         "category": "Video Game",
         "type": "PS5",
         "price": 69.99,
-        "quantity": 10
+        "quantity": 7
     },
     {
         "title": "men in black",
         "category": "movie",
         "type": "DVD",
         "price": 19.5,
-        "quantity": 5
+        "quantity": 1
     },
     {
         "title": "men in black",
         "category": "movie",
         "type": "blu ray",
         "price": 19.99,
-        "quantity": 10
+        "quantity": 9
     }
 ]
