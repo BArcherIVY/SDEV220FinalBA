@@ -4,14 +4,7 @@
         "category": "Video Game",
         "type": "PS5",
         "price": 69.99,
-        "quantity": 7
-    },
-    {
-        "title": "men in black",
-        "category": "movie",
-        "type": "DVD",
-        "price": 19.5,
-        "quantity": 1
+        "quantity": 5
     },
     {
         "title": "men in black",
@@ -19,5 +12,33 @@
         "type": "blu ray",
         "price": 19.99,
         "quantity": 9
+    },
+    {
+        "title": "Grand Theft Auto 18",
+        "category": "Video Game",
+        "type": "PS6",
+        "price": 1000.0,
+        "quantity": 19
+    },
+    {
+        "title": "Barry Lyndon",
+        "category": "Movie",
+        "type": "DVD",
+        "price": 15.0,
+        "quantity": 10
+    },
+    {
+        "title": "The legend of Zelda: Ocarina of time",
+        "category": "Video Game",
+        "type": "n64",
+        "price": 100.0,
+        "quantity": 10
+    },
+    {
+        "title": "Spider Man 2",
+        "category": "Movie",
+        "type": "DVD",
+        "price": 10.99,
+        "quantity": 2
     }
 ]
