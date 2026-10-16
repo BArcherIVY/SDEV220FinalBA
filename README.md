@@ -2,7 +2,7 @@
 
 ## Project Description
 
-For my SDEV220 final project, I created an inventory system for a fictional video game and movie store called Disc Replay. 
+For my SDEV220 final project, I created an inventory system for a video game/movie/electronic store called Disc Replay. 
 
 The program lets employees manage inventory, ring up cash sales, and keep track of previous transactions.
 
