@@ -1,0 +1,23 @@
+[
+    {
+        "title": "Ghost of Yotei",
+        "category": "Video Game",
+        "type": "PS5",
+        "price": 69.99,
+        "quantity": 10
+    },
+    {
+        "title": "men in black",
+        "category": "movie",
+        "type": "DVD",
+        "price": 19.5,
+        "quantity": 5
+    },
+    {
+        "title": "men in black",
+        "category": "movie",
+        "type": "blu ray",
+        "price": 19.99,
+        "quantity": 10
+    }
+]
