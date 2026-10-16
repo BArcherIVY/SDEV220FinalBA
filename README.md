@@ -2,9 +2,9 @@
 
 ## Project Description
 
-Disc Replay Inventory System is a Python application designed to manage inventory and process cash sales for a video game and movie store.
+For my SDEV220 final project, I created an inventory system for a fictional video game and movie store called Disc Replay. 
 
-The program uses a graphical user interface (GUI) built with Tkinter. It allows users to add, remove, search, and update inventory, process customer purchases, and view sales history.
+The program lets employees manage inventory, ring up cash sales, and keep track of previous transactions.
 
 ## How to Run the Program
 
