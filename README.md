@@ -84,7 +84,3 @@ Inventory and register information are saved so they can be loaded again when th
 - `register_gui.py` — Cash register interface.
 - `sales_history_gui.py` — Displays saved sales reports.
 
-## Project Information
-
-**Course:** SDEV220 – Python Programming  
-**Project:** Final Project – Disc Replay Inventory System
