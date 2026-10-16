@@ -1,4 +1,5 @@
 
+# Stores the information for each item in inventory
 class Item:
     def __init__(self, title, category, type, price, quantity):
         self.title = title

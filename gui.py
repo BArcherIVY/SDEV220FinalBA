@@ -9,10 +9,7 @@ from register_gui import RegisterGUI
 from sales_history_gui import SalesHistoryGUI
 
 
-# --------------------------------------------------
-# Application styling
-# --------------------------------------------------
-
+# Sets the colors and styles used throughout the main window
 def apply_theme(root):
     style = ttk.Style(root)
     style.theme_use("clam")
@@ -107,7 +104,6 @@ def apply_theme(root):
         foreground=[("disabled", muted)]
     )
 
-    # Blue button styling
     style.configure(
         "Accent.TButton",
         background=accent,
@@ -129,7 +125,6 @@ def apply_theme(root):
         ]
     )
 
-    # Red button styling for Clear Fields
     style.configure(
         "Danger.TButton",
         background="#DC2626",
@@ -190,6 +185,7 @@ def apply_theme(root):
     )
 
 
+# Builds the main inventory window and connects it to the other parts of the program
 class InventoryGUI:
     def __init__(self, root):
         self.root = root
@@ -204,7 +200,6 @@ class InventoryGUI:
         self.register_window = None
         self.history_window = None
 
-        # Prevent live search while fields are filled by code.
         self.updating_fields = False
 
         ttk.Label(
@@ -213,10 +208,7 @@ class InventoryGUI:
             style="Header.TLabel"
         ).pack(pady=(18, 12))
 
-        # --------------------------------------------------
-        # Inventory table
-        # --------------------------------------------------
-
+        # Creates the table that displays all inventory items
         table_frame = ttk.LabelFrame(
             root,
             text="Current Inventory"
@@ -293,10 +285,7 @@ class InventoryGUI:
             self.select_item
         )
 
-        # --------------------------------------------------
-        # Item details
-        # --------------------------------------------------
-
+        # Creates the input fields for adding or editing inventory items
         details_frame = ttk.LabelFrame(
             root,
             text="Item Details"
@@ -351,16 +340,13 @@ class InventoryGUI:
         details_frame.columnconfigure(0, weight=1)
         details_frame.columnconfigure(1, weight=1)
 
-        # Live inventory filtering.
+        # Searches the inventory automatically as the title is typed
         self.title_var.trace_add(
             "write",
             self.filter_inventory
         )
 
-        # --------------------------------------------------
-        # Inventory controls
-        # --------------------------------------------------
-
+        # Creates the buttons for managing inventory
         button_frame = ttk.LabelFrame(
             root,
             text="Inventory Controls"
@@ -371,7 +357,6 @@ class InventoryGUI:
             fill="x"
         )
 
-        # Searching happens automatically while typing.
         buttons = [
             ("Add Item", self.add_item),
             ("Remove Item", self.remove_item),
@@ -384,7 +369,6 @@ class InventoryGUI:
             row_number = index // 3
             column_number = index % 3
 
-            # Assign button colors.
             if button_text == "Add Item":
                 button_style = "Accent.TButton"
             elif button_text == "Clear Fields":
@@ -392,7 +376,6 @@ class InventoryGUI:
             else:
                 button_style = "TButton"
 
-            # Clear Fields spans the final two columns.
             column_span = (
                 2 if button_text == "Clear Fields" else 1
             )
@@ -414,10 +397,7 @@ class InventoryGUI:
         for column in range(3):
             button_frame.columnconfigure(column, weight=1)
 
-        # --------------------------------------------------
-        # Cash register section
-        # --------------------------------------------------
-
+        # Shows the current till balance and daily sales
         register_frame = ttk.LabelFrame(
             root,
             text="Cash Register"
@@ -485,10 +465,7 @@ class InventoryGUI:
         self.refresh_inventory()
         self.refresh_register()
 
-    # --------------------------------------------------
-    # Inventory display and live search
-    # --------------------------------------------------
-
+    # Refreshes the inventory table and filters items by title
     def refresh_inventory(self):
         search_text = self.title_var.get().strip().casefold()
 
@@ -517,6 +494,7 @@ class InventoryGUI:
 
         self.refresh_inventory()
 
+    # Updates the register totals shown on the main screen
     def refresh_register(self):
         self.till_label.config(
             text=f"Current Till: ${self.register.current_till:.2f}"
@@ -526,6 +504,7 @@ class InventoryGUI:
             text=f"Daily Sales: ${self.register.daily_sales:.2f}"
         )
 
+    # Fills in the item details when a row is selected
     def select_item(self, event=None):
         selected = self.inventory_table.selection()
 
@@ -548,6 +527,7 @@ class InventoryGUI:
         finally:
             self.updating_fields = False
 
+    # Clears the input fields and shows the full inventory again
     def clear_fields(self):
         self.updating_fields = True
 
@@ -567,10 +547,7 @@ class InventoryGUI:
 
         self.refresh_inventory()
 
-    # --------------------------------------------------
-    # Inventory operations
-    # --------------------------------------------------
-
+    # Finds the selected item using its title and format
     def get_item_from_fields(self):
         title = self.title_var.get().strip()
         item_type = self.type_var.get().strip()
@@ -600,6 +577,7 @@ class InventoryGUI:
 
         return item
 
+    # Adds a new item after checking that the information is valid
     def add_item(self):
         title = self.title_var.get().strip()
         category = self.category_var.get().strip()
@@ -657,6 +635,7 @@ class InventoryGUI:
             parent=self.root
         )
 
+    # Removes an item from inventory after confirming with the user
     def remove_item(self):
         item = self.get_item_from_fields()
 
@@ -690,6 +669,7 @@ class InventoryGUI:
                 parent=self.root
             )
 
+    # Updates the stock quantity for an existing item
     def update_quantity(self):
         item = self.get_item_from_fields()
 
@@ -726,6 +706,7 @@ class InventoryGUI:
                 parent=self.root
             )
 
+    # Updates the price of an existing item
     def update_price(self):
         item = self.get_item_from_fields()
 
@@ -762,10 +743,7 @@ class InventoryGUI:
                 parent=self.root
             )
 
-    # --------------------------------------------------
-    # Other windows
-    # --------------------------------------------------
-
+    # Opens the cash register or brings it to the front if already open
     def open_register(self):
         if (
             self.register_window is not None
@@ -782,6 +760,7 @@ class InventoryGUI:
             self.update_after_sale
         )
 
+    # Opens the sales history window
     def open_sales_history(self):
         if (
             self.history_window is not None
@@ -794,6 +773,7 @@ class InventoryGUI:
 
         self.history_window = SalesHistoryGUI(self.root)
 
+    # Refreshes the inventory and register totals after a sale
     def update_after_sale(self):
         self.refresh_inventory()
         self.refresh_register()

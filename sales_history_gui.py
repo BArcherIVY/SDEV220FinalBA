@@ -5,6 +5,7 @@ from pathlib import Path
 from datetime import datetime
 
 
+# Creates the window for viewing previous sales
 class SalesHistoryGUI:
     def __init__(self, parent):
         self.reports_folder = (
@@ -34,7 +35,7 @@ class SalesHistoryGUI:
             text="Most recent sales first"
         ).pack(pady=(0, 10))
 
-        # Bottom buttons
+        # Creates the refresh and close buttons
         button_frame = ttk.Frame(self.window)
         button_frame.pack(side="bottom", pady=12)
 
@@ -50,7 +51,7 @@ class SalesHistoryGUI:
             command=self.window.destroy
         ).pack(side="left", padx=10)
 
-        # Sales report display
+        # Creates the area where saved sales reports are displayed
         report_frame = ttk.LabelFrame(
             self.window,
             text="Recorded Sales"
@@ -98,11 +99,8 @@ class SalesHistoryGUI:
 
         self.refresh_history()
 
+    # Separates each transaction and register closing into its own entry
     def split_report_into_entries(self, contents):
-        """
-        Separate the report heading, transactions,
-        and register closing summaries.
-        """
         lines = contents.splitlines(keepends=True)
         entries = []
         current_entry = []
@@ -123,6 +121,7 @@ class SalesHistoryGUI:
 
         return entries
 
+    # Loads saved reports and displays the newest sales first
     def refresh_history(self):
         self.report_text.config(state="normal")
         self.report_text.delete("1.0", tk.END)
@@ -137,7 +136,6 @@ class SalesHistoryGUI:
             self.report_text.config(state="disabled")
             return
 
-        # Newest date first
         report_files = sorted(
             self.reports_folder.glob("sales_????-??-??.txt"),
             reverse=True
@@ -187,7 +185,7 @@ class SalesHistoryGUI:
                     contents
                 )
 
-                # Show newest transaction first
+                # Displays the latest transaction at the top
                 for entry in reversed(entries):
                     self.report_text.insert(
                         tk.END,
@@ -204,5 +202,5 @@ class SalesHistoryGUI:
 
         self.report_text.config(state="disabled")
 
-        # Start at the top of the newest sales
+        # Scrolls to the top when the history is refreshed
         self.report_text.see("1.0")

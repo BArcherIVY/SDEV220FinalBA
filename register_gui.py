@@ -4,6 +4,7 @@ from tkinter import ttk, messagebox
 from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 
 
+# Rounds money to two decimal places
 def money(value):
     return Decimal(str(value)).quantize(
         Decimal("0.01"),
@@ -11,13 +12,13 @@ def money(value):
     )
 
 
+# Creates the cash register window and handles the shopping cart
 class RegisterGUI:
     def __init__(self, parent, inventory, register, on_update):
         self.inventory = inventory
         self.register = register
         self.on_update = on_update
 
-        # Cart keys are (title, type) tuples.
         self.cart = {}
         self.selected_item = None
         self.matching_items = []
@@ -25,11 +26,9 @@ class RegisterGUI:
         self.window = tk.Toplevel(parent)
         self.window.title("Disc Replay - Cash Register")
 
-        # Open the Cash Register maximized.
         self.window.state("zoomed")
 
-        # The main GUI already applies the shared ttk theme.
-        # These colors match that theme.
+        # Sets up the colors and styles for the register window
         background = "#F3F5F9"
         surface = "#FFFFFF"
         text_color = "#1F2937"
@@ -37,8 +36,6 @@ class RegisterGUI:
 
         self.window.configure(bg=background)
 
-        # Local styles for the Cash Register.
-        # No imports from gui.py are needed.
         style = ttk.Style(self.window)
 
         style.configure(
@@ -81,20 +78,13 @@ class RegisterGUI:
             font=("Segoe UI", 16, "bold")
         )
 
-        # --------------------------------------------------
-        # Header
-        # --------------------------------------------------
-
         ttk.Label(
             self.window,
             text="Disc Replay Cash Register",
             style="Header.TLabel"
         ).pack(pady=(18, 12))
 
-        # --------------------------------------------------
-        # Bottom payment section
-        # --------------------------------------------------
-
+        # Creates the payment section at the bottom of the window
         bottom_frame = ttk.Frame(self.window)
         bottom_frame.pack(
             side="bottom",
@@ -110,7 +100,6 @@ class RegisterGUI:
         )
         self.total_label.pack(pady=(5, 10))
 
-        # Cash payment
         payment_frame = ttk.LabelFrame(
             bottom_frame,
             text="Cash Payment"
@@ -153,10 +142,7 @@ class RegisterGUI:
         )
         self.change_label.pack(pady=(3, 10))
 
-        # --------------------------------------------------
-        # Till and daily sales
-        # --------------------------------------------------
-
+        # Displays the current till amount and daily sales
         totals_frame = ttk.Frame(bottom_frame)
         totals_frame.pack(pady=8)
 
@@ -188,10 +174,7 @@ class RegisterGUI:
             command=self.close_register
         ).pack(side="left", padx=8)
 
-        # --------------------------------------------------
-        # Product search
-        # --------------------------------------------------
-
+        # Creates the product search field
         search_frame = ttk.LabelFrame(
             self.window,
             text="Search Products"
@@ -229,10 +212,7 @@ class RegisterGUI:
             self.focus_results
         )
 
-        # --------------------------------------------------
-        # Autocomplete results
-        # --------------------------------------------------
-
+        # Shows matching products as the user types
         self.results_frame = ttk.Frame(
             search_frame,
             style="RegisterSurface.TFrame"
@@ -278,10 +258,7 @@ class RegisterGUI:
 
         self.results_visible = False
 
-        # --------------------------------------------------
-        # Product information
-        # --------------------------------------------------
-
+        # Displays the stock and price of the selected product
         info_frame = ttk.Frame(
             search_frame,
             style="RegisterSurface.TFrame"
@@ -303,10 +280,7 @@ class RegisterGUI:
         )
         self.price_label.pack(side="left", padx=14)
 
-        # --------------------------------------------------
-        # Quantity controls
-        # --------------------------------------------------
-
+        # Creates the quantity buttons and Add to Cart button
         quantity_frame = ttk.LabelFrame(
             self.window,
             text="Quantity to Add"
@@ -352,10 +326,7 @@ class RegisterGUI:
             style="Accent.TButton"
         ).grid(row=0, column=3, padx=12)
 
-        # --------------------------------------------------
-        # Shopping cart
-        # --------------------------------------------------
-
+        # Creates the shopping cart table and its controls
         cart_frame = ttk.LabelFrame(
             self.window,
             text="Current Sale / Shopping Cart"
@@ -443,13 +414,11 @@ class RegisterGUI:
         self.refresh_register()
         self.search_entry.focus_set()
 
-    # --------------------------------------------------
-    # Product search
-    # --------------------------------------------------
-
+    # Uses the title and format together to identify each product
     def item_key(self, item):
         return (item.title, item.type)
 
+    # Reloads the available products and resets the search fields
     def refresh_items(self):
         self.items = self.inventory.view_inventory()
         self.selected_item = None
@@ -466,6 +435,7 @@ class RegisterGUI:
             text="Unit Price: $0.00"
         )
 
+    # Shows or hides the matching product list
     def show_results(self):
         if not self.results_visible:
             self.results_list.pack(
@@ -484,6 +454,7 @@ class RegisterGUI:
         self.results_scrollbar.pack_forget()
         self.results_visible = False
 
+    # Searches inventory for titles that match what the user types
     def search_products(self, event=None):
         search_text = self.search_var.get().strip().lower()
         self.selected_item = None
@@ -517,6 +488,7 @@ class RegisterGUI:
         else:
             self.hide_results()
 
+    # Lets the user move from the search box to the results with the arrow key
     def focus_results(self, event=None):
         if self.results_visible and self.matching_items:
             self.results_list.focus_set()
@@ -525,6 +497,7 @@ class RegisterGUI:
             self.results_list.activate(0)
             return "break"
 
+    # Selects a product from the search results
     def select_product(self, event=None):
         selection = self.results_list.curselection()
 
@@ -549,6 +522,7 @@ class RegisterGUI:
     def get_selected_item(self):
         return self.selected_item
 
+    # Updates the available stock and price for the selected product
     def update_item_details(self):
         item = self.get_selected_item()
 
@@ -567,10 +541,7 @@ class RegisterGUI:
         )
         self.quantity_var.set(1)
 
-    # --------------------------------------------------
-    # Quantity controls
-    # --------------------------------------------------
-
+    # Keeps the quantity within the available stock amount
     def increase_quantity(self):
         item = self.get_selected_item()
 
@@ -592,10 +563,7 @@ class RegisterGUI:
                 self.quantity_var.get() - 1
             )
 
-    # --------------------------------------------------
-    # Shopping cart
-    # --------------------------------------------------
-
+    # Adds the selected product to the cart if enough stock is available
     def add_to_cart(self):
         item = self.get_selected_item()
 
@@ -644,6 +612,7 @@ class RegisterGUI:
 
         self.search_entry.focus_set()
 
+    # Calculates the total price of everything in the cart
     def get_cart_total(self):
         total = Decimal("0.00")
 
@@ -655,6 +624,7 @@ class RegisterGUI:
 
         return total.quantize(Decimal("0.01"))
 
+    # Updates the cart table, total price, and change due
     def refresh_cart(self):
         for row in self.cart_table.get_children():
             self.cart_table.delete(row)
@@ -686,6 +656,7 @@ class RegisterGUI:
         )
         self.update_change()
 
+    # Removes the selected product from the cart
     def remove_selected(self):
         selection = self.cart_table.selection()
 
@@ -709,6 +680,7 @@ class RegisterGUI:
         if self.selected_item is not None:
             self.update_item_details()
 
+    # Empties the cart without changing the inventory
     def clear_cart(self):
         self.cart.clear()
         self.refresh_cart()
@@ -716,10 +688,7 @@ class RegisterGUI:
         if self.selected_item is not None:
             self.update_item_details()
 
-    # --------------------------------------------------
-    # Cash payment
-    # --------------------------------------------------
-
+    # Calculates the customer's change or shows how much is still owed
     def update_change(self, *args):
         total = self.get_cart_total()
         entered = self.cash_var.get().strip()
@@ -755,10 +724,7 @@ class RegisterGUI:
                 text=f"Change Due: ${change:.2f}"
             )
 
-    # --------------------------------------------------
-    # Register and checkout
-    # --------------------------------------------------
-
+    # Refreshes the current till and daily sales amounts
     def refresh_register(self):
         self.till_label.config(
             text=f"Current Till: ${self.register.current_till:.2f}"
@@ -767,6 +733,7 @@ class RegisterGUI:
             text=f"Daily Sales: ${self.register.daily_sales:.2f}"
         )
 
+    # Processes the payment and updates the inventory after a successful sale
     def complete_sale(self):
         if not self.cart:
             messagebox.showerror(
@@ -807,6 +774,7 @@ class RegisterGUI:
 
         self.search_entry.focus_set()
 
+    # Closes out the day's sales and resets the register to $150
     def close_register(self):
         if self.cart:
             messagebox.showerror(

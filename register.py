@@ -5,12 +5,14 @@ from decimal import Decimal, InvalidOperation, ROUND_HALF_UP
 from pathlib import Path
 
 
+# Rounds money to two decimal places
 def money(value):
     return Decimal(str(value)).quantize(
         Decimal("0.01"), rounding=ROUND_HALF_UP
     )
 
 
+# Handles sales, cash payments, and saving register information
 class Register:
     def __init__(self, inventory):
         self.inventory = inventory
@@ -26,6 +28,7 @@ class Register:
 
         self.load_register()
 
+    # Processes a sale for a single item
     def complete_sale(
         self, title, quantity, cash_received=None, type=None
     ):
@@ -43,6 +46,7 @@ class Register:
             cash_received
         )
 
+    # Calculates the total cost of the items in the cart
     def calculate_total(self, cart):
         total = Decimal("0.00")
 
@@ -58,6 +62,7 @@ class Register:
 
         return money(total)
 
+    # Checks the cart and payment before completing a sale
     def complete_cart_sale(self, cart, cash_received=None):
         if not cart:
             return False, "The cart is empty."
@@ -114,10 +119,7 @@ class Register:
 
         change = money(cash - total)
 
-        # --------------------------------------------------
-        # Check whether the till has enough cash for change
-        # --------------------------------------------------
-
+        # Makes sure there is enough cash in the till to give change
         available_cash = money(self.current_till)
 
         if change > available_cash:
@@ -130,10 +132,7 @@ class Register:
                 "Please enter a different cash amount and try again."
             )
 
-        # --------------------------------------------------
-        # Complete the sale only after all checks pass
-        # --------------------------------------------------
-
+        # Updates the inventory and register after all payment checks pass
         for item, quantity, unit_price, subtotal in sale_items:
             item.quantity -= quantity
 
@@ -170,10 +169,12 @@ class Register:
             f"Change Due: ${change:.2f}"
         )
 
+    # Creates the file path for the current day's sales report
     def get_report_path(self):
         date = datetime.now().strftime("%Y-%m-%d")
         return self.reports_folder / f"sales_{date}.txt"
 
+    # Saves each transaction to the daily sales report
     def save_transaction(self, sale_items, total, cash, change):
         self.reports_folder.mkdir(
             parents=True,
@@ -225,6 +226,7 @@ class Register:
             )
             file.write("=" * 55 + "\n\n")
 
+    # Closes the register, saves the totals, and resets the till
     def close_register(self):
         total_sales = self.daily_sales
         closing_till = self.current_till
@@ -241,6 +243,7 @@ class Register:
 
         return total_sales
 
+    # Adds the closing totals to the daily sales report
     def save_closing_summary(self, total_sales, closing_till):
         self.reports_folder.mkdir(
             parents=True,
@@ -287,6 +290,7 @@ class Register:
             )
             file.write("*" * 55 + "\n\n")
 
+    # Saves the current till and daily sales totals to JSON
     def save_register(self):
         self.file_path.parent.mkdir(
             parents=True,
@@ -306,6 +310,7 @@ class Register:
         ) as file:
             json.dump(data, file, indent=4)
 
+    # Loads the saved register totals when the program starts
     def load_register(self):
         if not self.file_path.exists():
             return
